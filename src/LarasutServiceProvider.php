@@ -5,7 +5,7 @@ namespace Yigit\Larasut;
 use Validator;
 use Illuminate\Support\ServiceProvider;
 
-class LarasutServiceProvier extends ServiceProvider
+class LarasutServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
