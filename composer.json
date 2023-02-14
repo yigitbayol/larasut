@@ -1,0 +1,17 @@
+{
+    "name": "yigit/larasut",
+    "description": "Laravel Paraşüt Paketi",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Yigit\\Larasut\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Yigit Bayol",
+            "email": "yigit@appricot.com.tr"
+        }
+    ],
+    "require": {}
+}
