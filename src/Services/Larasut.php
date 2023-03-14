@@ -201,9 +201,9 @@ class Larasut
     {
         $parameters = array(
             'grant_type' => 'refresh_token',
-            'client_id' => env('LARASUT_CLIENT_ID'),
-            'client_secret' => env('LARASUT_CLIENT_SECRET'),
-            'refresh_token' => $this->refresh_token
+            'client_id' => config('larasut.client_id'),
+            'client_secret' => config('larasut.client_secret'),
+            'refresh_token' => $this->getRefreshToken()
         );
 
         $response = Http::withBody(json_encode($parameters), 'application/json')
