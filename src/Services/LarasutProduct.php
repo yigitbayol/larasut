@@ -4,7 +4,7 @@ namespace Yigit\Larasut\Services;
 
 use Illuminate\Support\Facades\Http;
 
-class LarasutAccount extends Larasut
+class LarasutProduct extends Larasut
 {
     /**
      * Get All Products in Parasut
