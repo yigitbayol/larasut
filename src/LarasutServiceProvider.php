@@ -4,6 +4,7 @@ namespace Yigit\Larasut;
 
 use Validator;
 use Illuminate\Support\ServiceProvider;
+use Yigit\Larasut\Providers\ConfigServiceProvider;
 
 class LarasutServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,6 @@ class LarasutServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/Config/larasut.php', 'larasut');
+        $this->app->register(ConfigServiceProvider::class);
     }
 }
