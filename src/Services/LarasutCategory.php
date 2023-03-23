@@ -67,7 +67,7 @@ class LarasutCategory extends Larasut
      * @param  mixed $type  Product,Contact,SalesInvoice,Employee,Expenditure
      * @return void
      */
-    public function createCategory($name, $type)
+    public function createCategory($name, $type, $parent = 0)
     {
 
         $category = (object) array(
@@ -78,7 +78,7 @@ class LarasutCategory extends Larasut
                 array(
                     'name' => $name,
                     'category_type' => $type,
-                    'parent_id' => 0,
+                    'parent_id' => $parent,
                 ),
             ),
         );

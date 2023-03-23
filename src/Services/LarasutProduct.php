@@ -96,10 +96,6 @@ class LarasutProduct extends Larasut
                     "code" => isset($data->code) ? $data->code : null,
                     "name" => $data->name,
                     "vat_rate" => isset($data->vat_rate) ? $data->vat_rate : 0,
-                    "sales_excise_duty" => isset($data->sales_excise_duty) ? $data->sales_excise_duty : 0,
-                    "sales_excise_duty_type" => isset($data->sales_excise_duty_type) ? $data->sales_excise_duty_type : null,
-                    "purchase_excise_duty" => isset($data->purchase_excise_duty) ? $data->purchase_excise_duty : 0,
-                    "purchase_excise_duty_type" => isset($data->purchase_excise_duty_type) ? $data->purchase_excise_duty_type : null,
                     "unit" => isset($data->unit) ? $data->unit : null,
                     "communications_tax_rate" => isset($data->communications_tax_rate) ? $data->communications_tax_rate : 0,
                     "archived" => $archived,
@@ -129,7 +125,11 @@ class LarasutProduct extends Larasut
         $response = Http::withToken($this->getAccessToken())->withBody(json_encode($product), 'application/json')
             ->put($url);
 
-        return $response->successful() ? true : false;
+        $responseBody = json_decode($response->getBody(), true);
+
+        return $responseBody;
+
+        // return $response->successful() ? true : false;
     }
 
     /**
@@ -152,10 +152,6 @@ class LarasutProduct extends Larasut
                     "code" => isset($data->code) ? $data->code : null,
                     "name" => $data->name,
                     "vat_rate" => isset($data->vat_rate) ? $data->vat_rate : 0,
-                    "sales_excise_duty" => isset($data->sales_excise_duty) ? $data->sales_excise_duty : 0,
-                    "sales_excise_duty_type" => isset($data->sales_excise_duty_type) ? $data->sales_excise_duty_type : null,
-                    "purchase_excise_duty" => isset($data->purchase_excise_duty) ? $data->purchase_excise_duty : 0,
-                    "purchase_excise_duty_type" => isset($data->purchase_excise_duty_type) ? $data->purchase_excise_duty_type : null,
                     "unit" => isset($data->unit) ? $data->unit : null,
                     "communications_tax_rate" => isset($data->communications_tax_rate) ? $data->communications_tax_rate : 0,
                     "archived" => $archived,
@@ -178,7 +174,6 @@ class LarasutProduct extends Larasut
                 ]
             ]
         ];
-
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/products";
 
