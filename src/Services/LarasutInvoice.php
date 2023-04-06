@@ -77,18 +77,26 @@ class LarasutInvoice extends Larasut
     public function updateInvoice($id, $data, $products, $item_type = 'invoice', $currency = 'TRL', $discount_type = 'percentage', $shipment_included = true, $cash_sale = false, $is_abroad = false)
     {
         foreach ($products as $product) {
-            $attributes[] = [
+            $attributes = [
                 "quantity" => $product->quantity,
                 "unit_price" => $product->unit_price,
                 "vat_rate" => $product->vat_rate,
                 "discount_type" => $discount_type,
-                "discount_value" => $product->discount_value,
-                "description" => $product->description
+                "discount_value" => isset($product->discount_value) ? $product->discount_value : 0,
+                "description" => isset($product->description) ? $product->description : null
             ];
 
-            $productIds[] = [
+            $product = [
                 "id" => $product->parasut_id,
                 "type" => "products"
+            ];
+
+            $relationshipData[] = [
+                "type" => "sales_invoice_details",
+                "attributes" => $attributes,
+                "relationships" => [
+                    "product" => $product
+                ]
             ];
         }
 
@@ -132,9 +140,7 @@ class LarasutInvoice extends Larasut
                             [
                                 "type" => "sales_invoice_details",
                                 "attributes" => $attributes,
-                                "relationships" => [
-                                    "product" => $productIds
-                                ]
+                                "relationships" => $relationshipData
                             ]
                         ]
                     ]
@@ -166,7 +172,7 @@ class LarasutInvoice extends Larasut
     public function createInvoice($data, $products, $item_type = 'invoice', $currency = 'TRL', $discount_type = 'percentage', $shipment_included = true, $cash_sale = false, $is_abroad = false)
     {
         foreach ($products as $product) {
-            $attributes[] = [
+            $attributes = [
                 "quantity" => $product->quantity,
                 "unit_price" => $product->unit_price,
                 "vat_rate" => $product->vat_rate,
@@ -175,9 +181,17 @@ class LarasutInvoice extends Larasut
                 "description" => isset($product->description) ? $product->description : null
             ];
 
-            $productIds[] = [
+            $product = [
                 "id" => $product->parasut_id,
                 "type" => "products"
+            ];
+
+            $relationshipData[] = [
+                "type" => "sales_invoice_details",
+                "attributes" => $attributes,
+                "relationships" => [
+                    "product" => $product
+                ]
             ];
         }
 
@@ -221,9 +235,7 @@ class LarasutInvoice extends Larasut
                             [
                                 "type" => "sales_invoice_details",
                                 "attributes" => $attributes,
-                                "relationships" => [
-                                    "product" => $productIds
-                                ]
+                                "relationships" => $relationshipData
                             ]
                         ]
                     ]
@@ -237,6 +249,8 @@ class LarasutInvoice extends Larasut
             ->post($url);
 
         $responseBody = json_decode($response->getBody(), true);
+
+        dd($this->getAccessToken());
 
         if ($response->successful()) {
             return $responseBody['data']['id'];
