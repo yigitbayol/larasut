@@ -130,9 +130,6 @@ class LarasutInvoice extends Larasut
                     "shipment_addres" => isset($data->shipment_addres) ? $data->shipment_addres : null,
                     "shipment_included" => $shipment_included,
                     "cash_sale" => $cash_sale,
-                    "payment_account_id" => isset($data->payment_account_id) ? $data->payment_account_id : 0,
-                    "payment_date" => isset($data->payment_date) ? $data->payment_date : null,
-                    "payment_description" => isset($data->payment_description) ? $data->payment_description : null
                 ],
                 "relationships" => [
                     "details" => [
