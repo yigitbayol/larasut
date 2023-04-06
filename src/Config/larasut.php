@@ -8,7 +8,7 @@ return [
     | Client ID given by Parasut
     |
     */
-    'client_id' => env('LARASUT_CLIENT_ID', 'uneNiLAHWFLd8TYM_sKM9NIvYdPlgNXz-Y9NiceXnyM'),
+    'client_id' => env('LARASUT_CLIENT_ID'),
 
     /*
     |--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ return [
     | Client Secret given by Parasut
     |
     */
-    'client_secret' => env('LARASUT_CLIENT_SECRET', 'UnEtCvZzh1F4xsvNfGvlY6F9TsuluRcy3wJ9QGGz200'),
+    'client_secret' => env('LARASUT_CLIENT_SECRET'),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,7 +28,7 @@ return [
     | Redirect URI given by Parasut
     |
     */
-    'redirect_uri' => env('LARAVEL_REDIRECT_URI', 'urn:ietf:wg:oauth:2.0:oob'),
+    'redirect_uri' => env('LARAVEL_REDIRECT_URI'),
 
     /*
     |--------------------------------------------------------------------------
@@ -38,7 +38,7 @@ return [
     | Company ID given by Parasut
     |
     */
-    'company_id' => env('LARASUT_COMPANY_ID', '592268'),
+    'company_id' => env('LARASUT_COMPANY_ID'),
 
     /*
     |--------------------------------------------------------------------------
@@ -48,7 +48,7 @@ return [
     | Username of Parasut App
     |
     */
-    'username' => env('LARASUT_USERNAME', 'yigit@nono.company'),
+    'username' => env('LARASUT_USERNAME'),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ return [
     | Password of given User of Parasut App
     |
     */
-    'password' => env('LARASUT_PASSWORD', 'cgxS6d5Lx*!*'),
+    'password' => env('LARASUT_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------
