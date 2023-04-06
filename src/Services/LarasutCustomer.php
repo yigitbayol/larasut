@@ -76,17 +76,17 @@ class LarasutCustomer extends Larasut
             array(
                 'type' => 'contacts',
                 'attributes' => array(
-                    'email' => $data->email,
+                    'email' => isset($data->email) ? $data->email : "",
                     'name' => $data->name,
                     'short_name' => isset($data->short_name) ? $data->short_name : $data->name,
                     'contact_type' => $contact_type,
-                    'district' => $data->district,
-                    'city' => $data->city,
-                    'address' => $data->address,
-                    'phone' => isset($data->phone) ? $data->phone : null,
+                    'district' => isset($data->district) ? $data->district : "",
+                    'city' => isset($data->city) ? $data->city : "",
+                    'address' => isset($data->address) ? $data->address : "",
+                    'phone' => isset($data->phone) ? $data->phone : "",
                     'account_type' => $account_type,
-                    'tax_number' => $data->tax_number,
-                    'tax_office' => isset($data->tax_office) ? $data->tax_office : null
+                    'tax_number' => isset($data->tax_number) ? $data->tax_number : "",
+                    'tax_office' => isset($data->tax_office) ? $data->tax_office : ""
                 ),
                 'relationships' => array(
                     'category' => array(
@@ -123,17 +123,17 @@ class LarasutCustomer extends Larasut
             array(
                 'type' => 'contacts',
                 'attributes' => array(
-                    'email' => $data->email,
+                    'email' => isset($data->email) ? $data->email : "",
                     'name' => $data->name,
                     'short_name' => isset($data->short_name) ? $data->short_name : $data->name,
                     'contact_type' => $contact_type,
-                    'district' => $data->district,
-                    'city' => $data->city,
-                    'address' => $data->address,
-                    'phone' => isset($data->phone) ? $data->phone : null,
+                    'district' => isset($data->district) ? $data->district : "",
+                    'city' => isset($data->city) ? $data->city : "",
+                    'address' => isset($data->address) ? $data->address : "",
+                    'phone' => isset($data->phone) ? $data->phone : "",
                     'account_type' => $account_type,
-                    'tax_number' => $data->tax_number,
-                    'tax_office' => isset($data->tax_office) ? $data->tax_office : null
+                    'tax_number' => isset($data->tax_number) ? $data->tax_number : "",
+                    'tax_office' => isset($data->tax_office) ? $data->tax_office : ""
                 ),
                 'relationships' => array(
                     'category' => array(

@@ -210,7 +210,7 @@ class Larasut
 
         $responseBody = json_decode($response->getBody(), true);
 
-        if ($responseBody["error"] == "invalid_grant") {
+        if (isset($responseBody["error"]) && $responseBody["error"] == "invalid_grant") {
             $parameters = array(
                 'grant_type' => 'password',
                 'client_id' => config('larasut.client_id'),
