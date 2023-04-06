@@ -95,7 +95,9 @@ class LarasutInvoice extends Larasut
                 "type" => "sales_invoice_details",
                 "attributes" => $attributes,
                 "relationships" => [
-                    "product" => $product
+                    "product" => [
+                        "data" => $product
+                    ]
                 ]
             ];
         }
@@ -187,7 +189,9 @@ class LarasutInvoice extends Larasut
                 "type" => "sales_invoice_details",
                 "attributes" => $attributes,
                 "relationships" => [
-                    "product" => $product
+                    "product" => [
+                        "data" => $product
+                    ]
                 ]
             ];
         }
