@@ -157,7 +157,6 @@ class Larasut
     public function doAuth()
     {
         if ($this->access_token == '' || is_null($this->access_token)) {
-            dd("1");
             $parameters = array(
                 'grant_type' => 'password',
                 'client_id' => config('larasut.client_id'),
@@ -211,8 +210,28 @@ class Larasut
 
         $responseBody = json_decode($response->getBody(), true);
 
-        $this->setAccessToken($responseBody['access_token']);
-        $this->setRefreshToken($responseBody['refresh_token']);
+        if ($responseBody["error"] == "invalid_grant") {
+            $parameters = array(
+                'grant_type' => 'password',
+                'client_id' => config('larasut.client_id'),
+                'client_secret' => config('larasut.client_secret'),
+                'redirect_uri' => config('larasut.redirect_uri'),
+                "username" => config('larasut.username'),
+                "password" => config('larasut.password')
+            );
+
+            $response = Http::withBody(json_encode($parameters), 'application/json')
+            ->post('https://api.parasut.com/oauth/token');
+
+            $responseBody = json_decode($response->getBody(), true);
+
+            $this->setAccessToken($responseBody['access_token']);
+            $this->setRefreshToken($responseBody['refresh_token']);
+            $this->setExpireAt(Carbon::now()->addSeconds($responseBody['expires_in']));
+        } else {
+            $this->setAccessToken($responseBody['access_token']);
+            $this->setRefreshToken($responseBody['refresh_token']);
+        }
     }
 
     /**

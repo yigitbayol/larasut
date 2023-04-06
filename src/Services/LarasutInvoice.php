@@ -166,6 +166,11 @@ class LarasutInvoice extends Larasut
                 "discount_value" => isset($product->discount_value) ? $product->discount_value : 0,
                 "description" => isset($product->description) ? $product->description : null
             ];
+
+            $productIds[] = [
+                "id" => $product->parasut_id,
+                "type" => "products"
+            ];
         }
 
         $invoice = [
@@ -207,7 +212,10 @@ class LarasutInvoice extends Larasut
                         "data" => [
                             [
                                 "type" => "sales_invoice_details",
-                                "attributes" => $attributes
+                                "attributes" => $attributes,
+                                "relationships" => [
+                                    "product" => $productIds
+                                ]
                             ]
                         ]
                     ]
