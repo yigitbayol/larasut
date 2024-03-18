@@ -1,39 +1,43 @@
 {
-    "name": "yigitbayol/larasut",
-    "description": "Laravel Paraşüt Paketi",
-    "keywords": ["parasut","laravel","api"],
-    "license": "MIT",
-    "type": "library",
-    "autoload": {
-        "psr-4": {
-            "Yigit\\Larasut\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Yigit Bayol",
-            "email": "yigitbayol@gmail.com"
-        },
-        {
-            "name": "Sinan Daryakenarı",
-            "email": "d.sinan.k@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require-dev": {
-        "orchestra/testbench": "^7.22"
-    },
-    "extra": {
-        "laravel":{
-            "providers":[
-                "Yigit\\Larasut\\LarasutServiceProvider"
-            ],
-            "aliases" :{
-                "Larasut":"Yigit\\Larasut\\Facades\\Larasut"
-            }
-        }
-    },
-    "require": {
-        "guzzlehttp/guzzle": "^7.5@dev"
+  "name": "yigitbayol/larasut",
+  "description": "Laravel Paraşüt Paketi",
+  "keywords": [
+    "parasut",
+    "laravel",
+    "api"
+  ],
+  "license": "MIT",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Yigitbayol\\Larasut\\": "src/"
     }
+  },
+  "authors": [
+    {
+      "name": "Yigit Bayol",
+      "email": "yigitbayol@gmail.com"
+    },
+    {
+      "name": "Sinan Daryakenarı",
+      "email": "d.sinan.k@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require-dev": {
+    "orchestra/testbench": "^7.22"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Yigitbayol\\Larasut\\LarasutServiceProvider"
+      ],
+      "aliases": {
+        "Larasut": "Yigitbayol\\Larasut\\Facades\\Larasut"
+      }
+    }
+  },
+  "require": {
+    "guzzlehttp/guzzle": "^7.5@dev"
+  }
 }

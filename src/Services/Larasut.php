@@ -1,15 +1,16 @@
 <?php
 
-namespace Yigit\Larasut\Services;
+namespace Yigitbayol\Larasut\Services;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
 use App\Models\LarasutSetting;
-
+use Illuminate\Support\Facades\Http;
 
 class Larasut
 {
     private $access_token, $refresh_token, $expire_at, $default_customer_category, $default_sales_invoice_category;
+
+    public $account, $category, $customer, $invoice, $product;
 
     /**
      * Get Access Token
@@ -22,159 +23,58 @@ class Larasut
      */
     public function __construct()
     {
-        $this->access_token = $this->getAccessToken();
-        $this->expire_at = $this->getExpireAt();
-        $this->default_customer_category = $this->getCustomerCategoryId();
-        $this->default_sales_invoice_category = $this->getSalesInvoiceCategoryId();
-        $this->doAuth();
+        $this->initialize();
+        $this->customer = new Customer($this);
+        $this->invoice = new Invoice($this);
+        $this->account = new Account($this);
+        $this->category = new Category($this);
+        $this->product = new Product($this);
+
     }
 
-    /**
-     * Set Access Token
-     *
-     * @param  mixed $token
-     * @return void
-     */
-    private function setAccessToken($token)
+    public function initialize()
     {
-        $this->access_token = $token;
-        LarasutSetting::where('setting_key', 'access_token')->update([
-            'setting_value' => $token
-        ]);
+        $tokenDetails = $this->getAccessTokenFromDatabaseOrApi();
+        $this->access_token = $tokenDetails['access_token'];
+        $this->expire_at = $tokenDetails['expire_at'];
+        $this->expire_in = $tokenDetails['expire_in'];
     }
 
-    /**
-     * Get Access Token
-     *
-     * @return void
-     */
-    public function getAccessToken()
+    private function getAccessTokenFromDatabaseOrApi()
     {
-        return $this->access_token = LarasutSetting::where('setting_key', 'access_token')->first()->setting_value;
-    }
-
-    /**
-     * Set Customer Default Category Id
-     *
-     * @param  mixed $category
-     * @return void
-     */
-    private function setCustomerCategoryId($category)
-    {
-        $this->default_customer_category = $category;
-        LarasutSetting::where('setting_key', 'default_customer_category_id')->update([
-            'setting_value' => $category
-        ]);
-    }
-
-    /**
-     * Get Customer Default Category Id
-     *
-     * @return void
-     */
-    public function getCustomerCategoryId()
-    {
-        return $this->default_customer_category = LarasutSetting::where('setting_key', 'default_customer_category_id')->first()->setting_value;
-    }
-
-    /**
-     * Set Sales Invoice Default Category Id
-     *
-     * @param  mixed $category
-     * @return void
-     */
-    private function setSalesInvoiceCategoryId($category)
-    {
-        $this->default_sales_invoice_category = $category;
-        LarasutSetting::where('setting_key', 'default_sales_invoice_category_id')->update([
-            'setting_value' => $category
-        ]);
-    }
-
-    /**
-     * Get Sales Invoice Default Category Id
-     *
-     * @return void
-     */
-    public function getSalesInvoiceCategoryId()
-    {
-        return $this->default_sales_invoice_category = LarasutSetting::where('setting_key', 'default_sales_invoice_category_id')->first()->setting_value;
-    }
-
-    /**
-     * Set Token Expire At
-     *
-     * @param  mixed $expire_at
-     * @return void
-     */
-    private function setExpireAt($expire_at)
-    {
-        $this->expire_at = $expire_at;
-        LarasutSetting::where('setting_key', 'expire_at')->update([
-            'setting_value' => $expire_at
-        ]);
-    }
-
-    /**
-     * Get Token Expire At
-     *
-     * @return void
-     */
-    public function getExpireAt()
-    {
-        return $this->expire_at = LarasutSetting::where('setting_key', 'expire_at')->first()->setting_value;
-    }
-
-    /**
-     * Set Refresh Token
-     *
-     * @param  mixed $refresh_token
-     * @return void
-     */
-    private function setRefreshToken($refresh_token)
-    {
-        $this->refresh_token = $refresh_token;
-        LarasutSetting::where('setting_key', 'refresh_token')->update([
-            'setting_value' => $refresh_token
-        ]);
-    }
-
-    /**
-     * Get Refresh Token
-     *
-     * @return void
-     */
-    public function getRefreshToken()
-    {
-        return $this->refresh_token = LarasutSetting::where('setting_key', 'refresh_token')->first()->setting_value;
-    }
-
-    /**
-     * Do Authentication to Parasut API
-     *
-     * @return void
-     */
-    public function doAuth()
-    {
-        if ($this->access_token == '' || is_null($this->access_token)) {
-            $parameters = array(
-                'grant_type' => 'password',
-                'client_id' => config('larasut.client_id'),
-                'client_secret' => config('larasut.client_secret'),
-                'redirect_uri' => config('larasut.redirect_uri'),
-                "username" => config('larasut.username'),
-                "password" => config('larasut.password')
-            );
-
-            $response = Http::withBody(json_encode($parameters), 'application/json')
-                ->post('https://api.parasut.com/oauth/token');
-
-            $responseBody = json_decode($response->getBody(), true);
-
-            $this->setAccessToken($responseBody['access_token']);
-            $this->setRefreshToken($responseBody['refresh_token']);
-            $this->setExpireAt(Carbon::now()->addSeconds($responseBody['expires_in']));
+        // Önce veritabanından token'i deneyin
+        $setting = LarasutSetting::first();
+        if ($setting && $setting->access_token && $setting->expires_at > Carbon::now()) {
+            return [
+                'access_token' => $setting->access_token,
+                'expire_at' => $setting->expires_at,
+                'expire_in' => $setting->expires_in
+            ];
         }
+
+        // Token yoksa veya süresi dolmuşsa, API'den yeni bir token alın
+        return $this->fetchAccessTokenFromApi();
+    }
+
+    private function fetchAccessTokenFromApi()
+    {
+        $parameters = array(
+            'grant_type' => 'password',
+            'client_id' => config('larasut.client_id'),
+            'client_secret' => config('larasut.client_secret'),
+            'redirect_uri' => config('larasut.redirect_uri'),
+            "username" => config('larasut.username'),
+            "password" => config('larasut.password')
+        );
+
+        $response = Http::withBody(json_encode($parameters), 'application/json')
+            ->post('https://api.parasut.com/oauth/token');
+
+        $responseBody = json_decode($response->getBody(), true);
+
+        $this->setAccessToken($responseBody['access_token']);
+        $this->setRefreshToken($responseBody['refresh_token']);
+        $this->setExpireAt(Carbon::now()->addSeconds($responseBody['expires_in']));
 
         if ($this->expire_at == '' || is_null($this->expire_at) || Carbon::now() > date('Y-m-d H:i', strtotime($this->expire_at))) {
             $this->refreshToken();
@@ -189,6 +89,129 @@ class Larasut
             $sales_invoice_category_id = $this->createFirstCategory(config('larasut.default_sales_invoice_category_name'), 'SalesInvoice');
             $this->setSalesInvoiceCategoryId($sales_invoice_category_id);
         }
+    }
+
+    /**
+     * Set Access Token
+     *
+     * @param  mixed $token
+     * @return void
+     */
+    private function setAccessToken($token)
+    {
+        $this->access_token = $token;
+        // Veritabanında token ve süresini güncelleyin
+        LarasutSetting::updateOrCreate(['id' => 1], [
+            'access_token' => $token
+        ]);
+    }
+
+    /**
+     * Get Access Token
+     *
+     * @return void
+     */
+    public function getAccessToken()
+    {
+        return $this->access_token = LarasutSetting::first()->access_token;
+    }
+
+    /**
+     * Set Customer Default Category Id
+     *
+     * @param  mixed $category
+     * @return void
+     */
+    private function setCustomerCategoryId($category)
+    {
+        $this->default_customer_category = $category;
+        LarasutSetting::updateOrCreate(['id' => 1], [
+            'default_customer_category_id' => $category
+        ]);
+    }
+
+    /**
+     * Get Customer Default Category Id
+     *
+     * @return void
+     */
+    public function getCustomerCategoryId()
+    {
+        return $this->default_customer_category = LarasutSetting::first()->default_customer_category_id;
+    }
+
+    /**
+     * Set Sales Invoice Default Category Id
+     *
+     * @param  mixed $category
+     * @return void
+     */
+    private function setSalesInvoiceCategoryId($category)
+    {
+        $this->default_sales_invoice_category = $category;
+        LarasutSetting::updateOrCreate(['id' => 1], [
+            'default_sales_invoice_category_id' => $category
+        ]);
+    }
+
+    /**
+     * Get Sales Invoice Default Category Id
+     *
+     * @return void
+     */
+    public function getSalesInvoiceCategoryId()
+    {
+        return $this->default_sales_invoice_category = LarasutSetting::first()->default_sales_invoice_category_id;
+    }
+
+    /**
+     * Set Token Expire At
+     *
+     * @param  mixed $expire_at
+     * @return void
+     */
+    private function setExpireAt($expire_at)
+    {
+        $this->expire_at = $expire_at;
+
+        LarasutSetting::updateOrCreate(['id' => 1], [
+            'expire_at' => $expire_at
+        ]);
+    }
+
+    /**
+     * Get Token Expire At
+     *
+     * @return void
+     */
+    public function getExpireAt()
+    {
+        return $this->expire_at = LarasutSetting::first()->expire_at;
+    }
+
+    /**
+     * Set Refresh Token
+     *
+     * @param  mixed $refresh_token
+     * @return void
+     */
+    private function setRefreshToken($refresh_token)
+    {
+        $this->refresh_token = $refresh_token;
+
+        LarasutSetting::updateOrCreate(['id' => 1], [
+            'refresh_token' => $refresh_token
+        ]);
+    }
+
+    /**
+     * Get Refresh Token
+     *
+     * @return void
+     */
+    public function getRefreshToken()
+    {
+        return $this->refresh_token = LarasutSetting::first()->refresh_token;
     }
 
     /**
@@ -210,7 +233,7 @@ class Larasut
 
         $responseBody = json_decode($response->getBody(), true);
 
-        if (isset($responseBody["error"]) && $responseBody["error"] == "invalid_grant") {
+        if (isset ($responseBody["error"]) && $responseBody["error"] == "invalid_grant") {
             $parameters = array(
                 'grant_type' => 'password',
                 'client_id' => config('larasut.client_id'),
@@ -221,7 +244,7 @@ class Larasut
             );
 
             $response = Http::withBody(json_encode($parameters), 'application/json')
-            ->post('https://api.parasut.com/oauth/token');
+                ->post('https://api.parasut.com/oauth/token');
 
             $responseBody = json_decode($response->getBody(), true);
 
@@ -239,22 +262,22 @@ class Larasut
      *
      * @param  mixed $data
      * @param  mixed $type  Product,Contact,SalesInvoice,Employee,Expenditure
-     * @return void
+     * @return array
      */
-    public function createFirstCategory($name, $type)
+    public function createFirstCategory($name, $type): array
     {
 
         $category = (object) array(
             'data' =>
-            array(
-                'type' => 'item_categories',
-                'attributes' =>
                 array(
-                    'name' => $name,
-                    'category_type' => $type,
-                    'parent_id' => 0,
+                    'type' => 'item_categories',
+                    'attributes' =>
+                        array(
+                            'name' => $name,
+                            'category_type' => $type,
+                            'parent_id' => 0,
+                        ),
                 ),
-            ),
         );
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/item_categories";

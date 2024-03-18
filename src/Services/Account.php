@@ -1,22 +1,30 @@
 <?php
 
-namespace Yigit\Larasut\Services;
+namespace Yigitbayol\Larasut\Services;
 
 use Illuminate\Support\Facades\Http;
 
 
-class LarasutAccount extends Larasut
+class Account
 {
+
+    private $larasut;
+
+    public function __construct(Larasut $larasut)
+    {
+        $this->larasut = $larasut;
+    }
+
     /**
      * Get All Bank Accounts in Parasut
      *
      * @return void
      */
-    public function allAccounts()
+    public function getAll()
     {
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts";
 
-        $response = Http::withToken($this->getAccessToken())->get($url);
+        $response = Http::withToken($this->larasut->getAccessToken())->get($url);
 
         $responseBody = json_decode($response->getBody(), true);
 
@@ -29,12 +37,12 @@ class LarasutAccount extends Larasut
      * @param  mixed $query_parameters page[size],page[number],filter[name],filter[currency],filter[bank_name],filter[bank_branch],filter[account_type],filter[iban]
      * @return void
      */
-    public function allAccountsWithFilter($query_parameters)
+    public function getWithFilter($query_parameters)
     {
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts?" . http_build_query($query_parameters);
 
-        $response = Http::withToken($this->getAccessToken())->get($url);
+        $response = Http::withToken($this->larasut->getAccessToken())->get($url);
 
         $responseBody = json_decode($response->getBody(), true);
 
@@ -47,12 +55,12 @@ class LarasutAccount extends Larasut
      * @param  mixed $id
      * @return void
      */
-    public function getAccountById($id)
+    public function getById($id)
     {
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts/" . $id;
 
-        $response = Http::withToken($this->getAccessToken())->get($url);
+        $response = Http::withToken($this->larasut->getAccessToken())->get($url);
 
         $responseBody = json_decode($response->getBody(), true);
 
@@ -68,7 +76,7 @@ class LarasutAccount extends Larasut
      * @param bool $archived Default false
      * @return void
      */
-    public function updateAccount($id, $data, $currency = 'TRL', $account_type = 'bank', $archived = false)
+    public function update($id, $data, $currency = 'TRL', $account_type = 'bank', $archived = false): bool
     {
 
         $account = [
@@ -91,7 +99,7 @@ class LarasutAccount extends Larasut
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts/" . $id;
 
-        $response = Http::withToken($this->getAccessToken())->withBody(json_encode($account), 'application/json')
+        $response = Http::withToken($this->larasut->getAccessToken())->withBody(json_encode($account), 'application/json')
             ->put($url);
 
         return $response->successful() ? true : false;
@@ -106,7 +114,7 @@ class LarasutAccount extends Larasut
      * @param bool $archived Default false
      * @return void
      */
-    public function createAccount($data, $currency = 'TRL', $account_type = 'bank', $archived = false)
+    public function create($data, $currency = 'TRL', $account_type = 'bank', $archived = false): bool
     {
         $account = [
             "data" => [
@@ -128,7 +136,7 @@ class LarasutAccount extends Larasut
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts";
 
-        $response = Http::withToken($this->getAccessToken())->withBody(json_encode($account), 'application/json')
+        $response = Http::withToken($this->larasut->getAccessToken())->withBody(json_encode($account), 'application/json')
             ->post($url);
 
         $responseBody = json_decode($response->getBody(), true);
@@ -145,12 +153,12 @@ class LarasutAccount extends Larasut
      *
      * @return void
      */
-    public function deleteAccount($id)
+    public function delete($id): bool
     {
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts/" . $id;
 
-        $response = Http::withToken($this->getAccessToken())->delete($url);
+        $response = Http::withToken($this->larasut->getAccessToken())->delete($url);
 
         return $response->successful() ? true : false;
     }
@@ -161,11 +169,11 @@ class LarasutAccount extends Larasut
      *
      * @return void
      */
-    public function allTransactionsForAccount($id)
+    public function allTransactions($id)
     {
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts/" . $id . "/transactions/";
 
-        $response = Http::withToken($this->getAccessToken())->get($url);
+        $response = Http::withToken($this->larasut->getAccessToken())->get($url);
 
         $responseBody = json_decode($response->getBody(), true);
 
@@ -194,7 +202,7 @@ class LarasutAccount extends Larasut
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts/" . $id . "/debit_transactions";
 
-        $response = Http::withToken($this->getAccessToken())->withBody(json_encode($transaction), 'application/json')
+        $response = Http::withToken($this->larasut->getAccessToken())->withBody(json_encode($transaction), 'application/json')
             ->post($url);
 
         $responseBody = json_decode($response->getBody(), true);
@@ -228,7 +236,7 @@ class LarasutAccount extends Larasut
 
         $url = config('larasut.api_v4_url') . config('larasut.company_id') . "/accounts/" . $id . "/credit_transactions";
 
-        $response = Http::withToken($this->getAccessToken())->withBody(json_encode($transaction), 'application/json')
+        $response = Http::withToken($this->larasut->getAccessToken())->withBody(json_encode($transaction), 'application/json')
             ->post($url);
 
         $responseBody = json_decode($response->getBody(), true);

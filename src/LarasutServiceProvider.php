@@ -1,10 +1,9 @@
 <?php
 
-namespace Yigit\Larasut;
+namespace Yigitbayol\Larasut;
 
-use Validator;
 use Illuminate\Support\ServiceProvider;
-use Yigit\Larasut\Providers\ConfigServiceProvider;
+use Yigitbayol\Larasut\Providers\ConfigServiceProvider;
 
 class LarasutServiceProvider extends ServiceProvider
 {
@@ -15,12 +14,7 @@ class LarasutServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->bootValidator();
-    }
 
-    protected function bootValidator()
-    {
-        //
     }
 
     /**
